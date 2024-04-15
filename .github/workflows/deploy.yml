@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - '*'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,19 +22,26 @@ jobs:
       - name: Build
         run: go build -o greeter greeter.go
 
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: your-aws-region
+          aws-region: eu-central-1
 
       - name: Login to Amazon ECR
         id: login-ecr
-        run: aws ecr get-login-password --region your-aws-region | docker login --username AWS --password-stdin your-aws-account-id.dkr.ecr.your-aws-region.amazonaws.com
+        run: aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 891377396516.dkr.ecr.eu-central-1.amazonaws.com
+
+      - name: Build Docker image
+        run: docker build -t hivemind_app_repo .
 
       - name: Tag Docker image
-        run: docker tag your-docker-image:latest your-aws-account-id.dkr.ecr.your-aws-region.amazonaws.com/your-repository-name:latest
+        run: docker tag hivemind_app_repo:latest 891377396516.dkr.ecr.eu-central-1.amazonaws.com/hivemind_app_repo:latest
 
       - name: Push Docker image to ECR
-        run: docker push your-aws-account-id.dkr.ecr.your-aws-region.amazonaws.com/your-repository-name:latest
+        run: docker push 891377396516.dkr.ecr.eu-central-1.amazonaws.com/hivemind_app_repo:latest
+
+      - name: Pull Docker image to runner
+        run: docker pull 891377396516.dkr.ecr.eu-central-1.amazonaws.com/hivemind_app_repo:latest
