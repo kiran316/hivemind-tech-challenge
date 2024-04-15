@@ -1,50 +1,50 @@
-name: Terraform Pipeline
-
-on:
-  push:
-    branches:
-      - '*'
-  workflow_dispatch:
-
-env:
-    AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-    AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
-
-
-    - name: Install AWS CLI
-      run: |
-         sudo apt-get update
-         sudo apt-get install awscli -y
-
-    - name: Configuring AWS
-      run: |
-        aws configure set aws_access_key_id $AWS_ACCESS_KEY
-        aws configure set aws_secret_access_key $AWS_SECRET_KEY
-        aws configure set region eu-central-1
-
-    - name: Terraform Init
-      working-directory: ./terraform-eks
-      run: terraform init
-
-    - name: Terraform Validate
-      working-directory: ./terraform-eks
-      run: terraform validate
-
-    - name: Terraform Plan
-      working-directory: terraform-eks
-      run: terraform plan
-
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main'
-      working-directory: ./terraform-eks
-      run: terraform apply --auto-approve
+#name: Terraform Pipeline
+#
+#on:
+#  push:
+#    branches:
+#      - '*'
+#  workflow_dispatch:
+#
+#env:
+#    AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+#    AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#    - name: Checkout code
+#      uses: actions/checkout@v2
+#
+#    - name: Setup Terraform
+#      uses: hashicorp/setup-terraform@v1
+#
+#
+#    - name: Install AWS CLI
+#      run: |
+#         sudo apt-get update
+#         sudo apt-get install awscli -y
+#
+#    - name: Configuring AWS
+#      run: |
+#        aws configure set aws_access_key_id $AWS_ACCESS_KEY
+#        aws configure set aws_secret_access_key $AWS_SECRET_KEY
+#        aws configure set region eu-central-1
+#
+#    - name: Terraform Init
+#      working-directory: ./terraform-eks
+#      run: terraform init
+#
+#    - name: Terraform Validate
+#      working-directory: ./terraform-eks
+#      run: terraform validate
+#
+#    - name: Terraform Plan
+#      working-directory: terraform-eks
+#      run: terraform plan
+#
+#    - name: Terraform Apply
+#      if: github.ref == 'refs/heads/main'
+#      working-directory: ./terraform-eks
+#      run: terraform apply --auto-approve
