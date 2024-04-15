@@ -1,0 +1,11 @@
+# Ignore Terraform local state
+terraform-eks/.terraform/
+
+# Ignore Terraform state files
+terraform-eks/*.tfstate
+
+# Ignore Terraform lock file
+terraform-eks/.terraform.lock.hcl
+
+# Ignore .idea folder
+.idea/
