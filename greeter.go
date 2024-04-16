@@ -22,15 +22,12 @@ func main() {
 }
 
 func HelloServer(w http.ResponseWriter, r *http.Request) {
-	fmtStr := fmt.Sprintf("Hello, %s! I'm %s", GetIPFromRequest(r), os.Getenv("HOSTNAME"))
-	fmt.Println(fmtStr)
-	fmt.Fprintln(w, fmtStr)
-}
-
-func GetIPFromRequest(r *http.Request) string {
-	if fwd := r.Header.Get("x-forwarded-for"); fwd != "" {
-		return fwd
+	name := r.URL.Query().Get("name")
+	if name == "" {
+		name = "Guest"
 	}
 
-	return r.RemoteAddr
+	fmtStr := fmt.Sprintf("Hello, %s! I'm %s", name, os.Getenv("HOSTNAME"))
+	fmt.Println(fmtStr)
+	fmt.Fprintln(w, fmtStr)
 }
