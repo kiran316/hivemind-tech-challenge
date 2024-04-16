@@ -9,3 +9,7 @@ terraform-eks/.terraform.lock.hcl
 
 # Ignore .idea folder
 .idea/
+
+# ignore go mod-sum files
+go.mod
+go.sum

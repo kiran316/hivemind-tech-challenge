@@ -22,6 +22,7 @@ jobs:
       - name: Build
         run: go build -o greeter greeter.go
 
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
