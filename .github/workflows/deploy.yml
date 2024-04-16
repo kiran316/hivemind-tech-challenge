@@ -26,39 +26,57 @@ jobs:
       - name: Build
         run: go build -o greeter greeter.go
 
+#      - name: Install AWS CLI
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install awscli -y
 
-#      - name: Configure AWS credentials
-#        uses: aws-actions/configure-aws-credentials@v1
-#        with:
-#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          aws-region: eu-central-1
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install awscli -y
+#      - name: Configuring AWS
+#        run: |
+#          aws configure set aws_access_key_id $AWS_ACCESS_KEY
+#          aws configure set aws_secret_access_key $AWS_SECRET_KEY
+#          aws configure set region eu-central-1
 
-      - name: Configuring AWS
-        run: |
-          aws configure set aws_access_key_id $AWS_ACCESS_KEY
-          aws configure set aws_secret_access_key $AWS_SECRET_KEY
-          aws configure set region eu-central-1
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: eu-central-1
 
       - name: Login to Amazon ECR
-        id: login-ecr
-        run: aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 891377396516.dkr.ecr.eu-central-1.amazonaws.com
+          id: login-ecr
+          uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build Docker image
-        run: docker build -t hivemind_app_repo .
+      - name: Build, tag, and push the image to Amazon ECR
+          id: build-image
+            env:
+              ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+              ECR_REPOSITORY: hivemind-prod
+              IMAGE_TAG: "latest"
 
-      - name: Tag Docker image
-        run: docker tag hivemind_app_repo:latest 891377396516.dkr.ecr.eu-central-1.amazonaws.com/hivemind_app_repo:latest
+            run: |
+              # Build a docker container and push it to ECR
+              docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+              echo "Pushing image to ECR..."
+              docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+              echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-      - name: Push Docker image to ECR
-        run: docker push 891377396516.dkr.ecr.eu-central-1.amazonaws.com/hivemind_app_repo:latest
-
-      - name: Pull Docker image to runner
-        run: docker pull 891377396516.dkr.ecr.eu-central-1.amazonaws.com/hivemind_app_repo:latest
+#      - name: Login to Amazon ECR
+#        id: login-ecr
+#        run: aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 891377396516.dkr.ecr.eu-central-1.amazonaws.com
+#
+#      - name: Build Docker image
+#        run: docker build -t hivemind_app_repo .
+#
+#      - name: Tag Docker image
+#        run: docker tag hivemind_app_repo:latest 891377396516.dkr.ecr.eu-central-1.amazonaws.com/hivemind_app_repo:latest
+#
+#      - name: Push Docker image to ECR
+#        run: docker push 891377396516.dkr.ecr.eu-central-1.amazonaws.com/hivemind_app_repo:latest
+#
+#      - name: Pull Docker image to runner
+#        run: docker pull 891377396516.dkr.ecr.eu-central-1.amazonaws.com/hivemind_app_repo:latest
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v1
@@ -69,4 +87,7 @@ jobs:
         run: aws eks --region eu-central-1 update-kubeconfig --name hivemind-prod-challenge
 
       - name: Deploy to EKS cluster
-        run: kubectl apply -f kubernetes/deployment.yml
+        run: |
+          kubectl apply -f kubernetes/deployment.yaml
+          kubectl apply -f kubernetes/service.yaml
+
