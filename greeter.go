@@ -4,74 +4,30 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"os/user"
-	"math/rand"
-	"time"
-	"log"
 
+	"github.com/google/uuid"
 )
 
 func main() {
-	finish := make(chan bool)
-	path, err := os.Getwd()
-	if err != nil {
-		log.Println(err)
-	}
-	user, err := user.Current()
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
+	// Generate a unique tag
+	uniqueTag := uuid.New().String()
 
-	username := user.Username
+	// Set the HELLO_TAG environment variable to the generated unique tag
+	os.Setenv("HELLO_TAG", uniqueTag)
 
-	fmt.Printf("Username: %s\n", username)
-	fmt.Println(path)
 	fmt.Println("Hivemind's Go Greeter")
-	rand.Seed(time.Now().UnixNano())
-	stri:= RandomString(6)
-	os.Setenv("HELLO_TAG", stri)
-	fmt.Println("You are running the service with this tag: ", os.Getenv("HELLO_TAG"))
-	server8080 := http.NewServeMux()
-	server8080.HandleFunc("/", HelloServer)
-	server8080.HandleFunc("/param", NameServer)
-
-
-	go func() {
-		http.ListenAndServe(":8080", server8080)
-	}()
-
-	<-finish
-}
-
-func RandomString(n int) string {
-    var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
-    s := make([]rune, n)
-    for i := range s {
-        s[i] = letters[rand.Intn(len(letters))]
-    }
-    return string(s)
+	fmt.Println("You are running the service with this tag: ", uniqueTag)
+	http.HandleFunc("/", HelloServer)
+	http.ListenAndServe(":8080", nil)
 }
 
 func HelloServer(w http.ResponseWriter, r *http.Request) {
-	fmtStr := fmt.Sprintf("Hello, %s! I'm %s", GetIPFromRequest(r), os.Getenv("HOSTNAME"))
+	name := r.URL.Query().Get("name")
+	if name == "" {
+		name = "Guest"
+	}
+
+	fmtStr := fmt.Sprintf("Hello, %s! I'm %s", name, os.Getenv("HOSTNAME"))
 	fmt.Println(fmtStr)
 	fmt.Fprintln(w, fmtStr)
 }
-
-func GetIPFromRequest(r *http.Request) string {
-	if fwd := r.Header.Get("x-forwarded-for"); fwd != "" {
-		return fwd
-	}
-
-	return r.RemoteAddr
-}
-
-func NameServer(w http.ResponseWriter, req *http.Request) {
-	v := req.FormValue("name")
-	fmt.Fprintln(w, "Your name is: "+v)
-}
-
-
-// http://localhost:8080/
-// http://localhost:8080/param?name=nandini

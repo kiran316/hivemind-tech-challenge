@@ -4,11 +4,7 @@ on:
   push:
     branches:
       - '*'
-  workflow_dispatch:
-#
-#env:
-#    AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-#    AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+
 
 jobs:
   build:
