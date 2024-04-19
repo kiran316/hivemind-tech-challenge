@@ -10,27 +10,6 @@ module "eks" {
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.public_subnets
 
-#  cluster_addons = [
-#    {
-#      addon_name        = "vpc-cni"
-#      addon_version     = "v1.18.0-eksbuild.1"
-#      cluster_name      = local.cluster_name
-#      resolve_conflicts = "OVERWRITE"
-#    },
-#    {
-#      addon_name        = "kube-proxy"
-#      addon_version     = "v1.29.3-eksbuild.2"
-#      cluster_name      = local.cluster_name
-#      resolve_conflicts = "OVERWRITE"
-#    },
-#    {
-#      addon_name        = "coredns"
-#      addon_version     = "v1.11.1-eksbuild.4"
-#      cluster_name      = local.cluster_name
-#      resolve_conflicts = "OVERWRITE"
-#    }
-#  ]
-
   enable_irsa = true
 
   tags = {
