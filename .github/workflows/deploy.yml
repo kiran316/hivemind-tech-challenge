@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - '*'
+    workflow_dispatch:
 
 
 jobs:
@@ -59,4 +60,3 @@ jobs:
         run: |
           kubectl apply -f kubernetes/deployment.yml
           kubectl apply -f kubernetes/service.yml
-

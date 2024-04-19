@@ -1,25 +1,43 @@
-Welcome to the Hivemind DevOps Challenge repository! Here you will find everything from setting up infrastructure with Terraform, writing manifests for kubernetes to deployment workflow with github actions. 
+# Hivemind DevOps Challenge
 
-Kindly follow the below instructions:
+Welcome to the Hivemind DevOps Challenge repository! This repository contains everything you need to set up infrastructure with Terraform, deploy applications on Kubernetes, and implement CI/CD workflows using GitHub Actions.
+
+## Table of Contents
+- [Infrastructure](#infrastructure)
+- [Orchestration](#orchestration)
+- [CI/CD](#cicd)
+- [Accessing the Deployed Application](#accessing-the-deployed-application)
+
+## Infrastructure
 ### terraform-eks
-It includes various files to create 3 main components as below: 
-Virtual Private Cloud (VPC) -> across 3 availability zones 
-Elastic Container Service (EKS) -> 2 to 6 nodes cluster
-Amazon Elastic Container Registry (ECR) -> To store docker images
+The infrastructure in AWS is created using Terraform, comprising:
+- Virtual Private Cloud (VPC) across 3 availability zones.
+- Elastic Container Service (EKS) with a cluster size ranging from 2 to 6 nodes.
+- Amazon Elastic Container Registry (ECR) to store Docker images.
 
-Modules are used to avoid writing resources.
-
+## Orchestration
 ### kubernetes
-It includes k8s manifests for application deployment and service. 
-Deployment -> Rolling update(default strategy) for app deployment
-service -> Load balancer service, generate alb url to access it from outside world.
+This section includes Kubernetes manifests for application deployment and service.
+- Deployment: Implements a rolling update strategy for application deployment.
+- Service: Sets up a LoadBalancer service to generate an ALB URL for external access.
 
-### workflows
-we have 2 workflows in place:
- terraform.yml
- deploy.yml
+## CI/CD
+### Workflows
+Two GitHub Actions workflows are in place:
+- `terraform.yml`: Creates infrastructure using Terraform.
+- `deploy.yml`: Deploys the application on EKS.
 
-Please first run terraform.yml to create infrastructure.
-Use deploy.yml workflow to deploy app on EKS.
+Please run `terraform.yml` first to create the infrastructure, followed by `deploy.yml` to deploy the app on EKS.
 
-Once app is deployed one should be able to access via ALB url such as:a1c05c130144b4639a8e8c8cf2244377-1958473415.eu-central-1.elb.amazonaws.com
+## Accessing the Deployed Application
+Once the app is deployed, you can access it via the ALB URL:
+http://af47430888c6f4108973661f5f15402f-1713964486.eu-central-1.elb.amazonaws.com/
+
+### Example Requests and Responses:
+- Accessing with a name parameter:
+  - Request: http://af47430888c6f4108973661f5f15402f-1713964486.eu-central-1.elb.amazonaws.com/?name=alice
+  - Response: Hello, Alice! I'm go-app-67556dc898-kzcpn
+- Accessing without a name parameter:
+  - Request: http://af47430888c6f4108973661f5f15402f-1713964486.eu-central-1.elb.amazonaws.com/?name
+  - Response: Hello, Guest! I'm go-app-67556dc898-kzcpn
+
